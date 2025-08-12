@@ -1,0 +1,246 @@
+<!-- Dashboard de Monitoramento de Equipamentos Pneumáticos -->
+<div class="dashboard-container">
+  <!-- Header do Dashboard -->
+  <div class="dashboard-header">
+    <h1>🔧 Digital Twin - Monitoramento Pneumático</h1>
+    <p>
+      Sistema de monitoramento preventivo para equipamentos pneumáticos Festo
+    </p>
+  </div>
+
+  <!-- Loading e Error States -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Carregando dados dos equipamentos...</p>
+  </div>
+
+  <div *ngIf="error" class="error-container">
+    <p>⚠️ {{ error }}</p>
+    <button (click)="carregarDados()" class="retry-button">
+      Tentar Novamente
+    </button>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && !error" class="dashboard-content">
+    <!-- Estatísticas Principais -->
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalEquipamentos }}</h3>
+          <p>Equipamentos Ativos</p>
+        </div>
+      </div>
+
+      <div class="stat-card operando">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>{{ stats.equipamentosOperando }}</h3>
+          <p>Operando</p>
+        </div>
+      </div>
+
+      <div class="stat-card manutencao">
+        <div class="stat-icon">🔧</div>
+        <div class="stat-content">
+          <h3>{{ stats.equipamentosManutencao }}</h3>
+          <p>Em Manutenção</p>
+        </div>
+      </div>
+
+      <div class="stat-card falha">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-content">
+          <h3>{{ stats.equipamentosFalha }}</h3>
+          <p>Com Falha</p>
+        </div>
+      </div>
+
+      <div class="stat-card vencida">
+        <div class="stat-icon">⏰</div>
+        <div class="stat-content">
+          <h3>{{ stats.manutencaoVencida }}</h3>
+          <p>Manutenção Vencida</p>
+        </div>
+      </div>
+
+      <div class="stat-card confiabilidade">
+        <div class="stat-icon">📈</div>
+        <div class="stat-content">
+          <h3>{{ stats.percentualConfiabilidade }}%</h3>
+          <p>Confiabilidade Média</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertas Críticos -->
+    <div class="alerts-section" *ngIf="getEquipamentosCriticos().length > 0">
+      <h2>🚨 Equipamentos Críticos</h2>
+      <div class="equipment-grid">
+        <div
+          *ngFor="let equipamento of getEquipamentosCriticos()"
+          class="equipment-card critical"
+        >
+          <div class="equipment-header">
+            <h3>{{ equipamento.nome }}</h3>
+            <span
+              class="status-badge"
+              [style.background-color]="getStatusColor(equipamento.status)"
+            >
+              {{ equipamento.status }}
+            </span>
+          </div>
+          <div class="equipment-details">
+            <p><strong>Tipo:</strong> {{ equipamento.tipo }}</p>
+            <p>
+              <strong>Fabricante:</strong> {{ equipamento.fabricante || "N/A" }}
+            </p>
+            <p>
+              <strong>Status Saúde:</strong>
+              <span [style.color]="getSaudeColor(equipamento.statusSaude)">
+                {{ equipamento.statusSaude }}
+              </span>
+            </p>
+            <div class="reliability-bar">
+              <div
+                class="reliability-progress"
+                [style.width]="
+                  getProgressWidth(equipamento.scoreConfiabilidade)
+                "
+                [style.background-color]="
+                  getProgressColor(equipamento.scoreConfiabilidade)
+                "
+              ></div>
+              <span class="reliability-text"
+                >{{ (equipamento.scoreConfiabilidade * 100).toFixed(0) }}%</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipamentos que Precisam de Atenção -->
+    <div class="attention-section" *ngIf="getEquipamentosAtencao().length > 0">
+      <h2>⚠️ Equipamentos que Precisam de Atenção</h2>
+      <div class="equipment-grid">
+        <div
+          *ngFor="let equipamento of getEquipamentosAtencao()"
+          class="equipment-card attention"
+        >
+          <div class="equipment-header">
+            <h3>{{ equipamento.nome }}</h3>
+            <span
+              class="status-badge"
+              [style.background-color]="getStatusColor(equipamento.status)"
+            >
+              {{ equipamento.status }}
+            </span>
+          </div>
+          <div class="equipment-details">
+            <p>
+              <strong>Próxima Manutenção:</strong>
+              <span *ngIf="equipamento.diasParaProximaManutencao !== undefined">
+                {{ equipamento.diasParaProximaManutencao }} dias
+              </span>
+              <span *ngIf="equipamento.diasParaProximaManutencao === undefined"
+                >N/A</span
+              >
+            </p>
+            <p>
+              <strong>Última Manutenção:</strong>
+              {{ formatarData(equipamento.dataUltimaManutencao) }}
+            </p>
+            <div class="reliability-bar">
+              <div
+                class="reliability-progress"
+                [style.width]="
+                  getProgressWidth(equipamento.scoreConfiabilidade)
+                "
+                [style.background-color]="
+                  getProgressColor(equipamento.scoreConfiabilidade)
+                "
+              ></div>
+              <span class="reliability-text"
+                >{{ (equipamento.scoreConfiabilidade * 100).toFixed(0) }}%</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista Completa de Equipamentos -->
+    <div class="all-equipment-section">
+      <h2>📋 Todos os Equipamentos</h2>
+      <div class="equipment-table-container">
+        <table class="equipment-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Status</th>
+              <th>Saúde</th>
+              <th>Confiabilidade</th>
+              <th>Próxima Manutenção</th>
+              <th>Ciclos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let equipamento of equipamentos" class="equipment-row">
+              <td>
+                <strong>{{ equipamento.nome }}</strong>
+                <small>{{ equipamento.numeroSerie || "S/N" }}</small>
+              </td>
+              <td>{{ equipamento.tipo }}</td>
+              <td>
+                <span
+                  class="status-badge small"
+                  [style.background-color]="getStatusColor(equipamento.status)"
+                >
+                  {{ equipamento.status }}
+                </span>
+              </td>
+              <td>
+                <span [style.color]="getSaudeColor(equipamento.statusSaude)">
+                  {{ equipamento.statusSaude }}
+                </span>
+              </td>
+              <td>
+                <div class="reliability-bar small">
+                  <div
+                    class="reliability-progress"
+                    [style.width]="
+                      getProgressWidth(equipamento.scoreConfiabilidade)
+                    "
+                    [style.background-color]="
+                      getProgressColor(equipamento.scoreConfiabilidade)
+                    "
+                  ></div>
+                  <span class="reliability-text"
+                    >{{
+                      (equipamento.scoreConfiabilidade * 100).toFixed(0)
+                    }}%</span
+                  >
+                </div>
+              </td>
+              <td>
+                <span
+                  *ngIf="equipamento.diasParaProximaManutencao !== undefined"
+                >
+                  {{ equipamento.diasParaProximaManutencao }} dias
+                </span>
+                <span
+                  *ngIf="equipamento.diasParaProximaManutencao === undefined"
+                  >N/A</span
+                >
+              </td>
+              <td>{{ equipamento.ciclosRealizados || 0 | number }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

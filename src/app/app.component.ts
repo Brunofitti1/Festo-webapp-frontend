@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { EquipamentosDashboardComponent } from './components/equipamentos-dashboard/equipamentos-dashboard.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, EquipamentosDashboardComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'festo-webapp-frontend';
+  title = 'Festo Digital Twin - Monitoramento Pneumático';
 }
