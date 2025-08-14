@@ -1,0 +1,303 @@
+<!-- Formulário de Cadastro de Equipamento -->
+<div class="cadastro-container">
+  <div class="cadastro-header">
+    <h2>🔧 Cadastrar Novo Equipamento</h2>
+    <p>Preencha as informações do equipamento pneumático</p>
+  </div>
+
+  <form
+    [formGroup]="equipamentoForm"
+    (ngSubmit)="onSubmit()"
+    class="cadastro-form"
+  >
+    <!-- Mensagens de Sucesso e Erro -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      ✅ {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error">
+      ❌ {{ errorMessage }}
+    </div>
+
+    <!-- Seção: Informações Básicas -->
+    <div class="form-section">
+      <h3>📝 Informações Básicas</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome">Nome do Equipamento *</label>
+          <input
+            type="text"
+            id="nome"
+            formControlName="nome"
+            placeholder="Ex: Cilindro Pneumático CP-200"
+            [class.invalid]="isFieldInvalid('nome')"
+          />
+          <div *ngIf="isFieldInvalid('nome')" class="error-message">
+            {{ getFieldError("nome") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="tipo">Tipo de Equipamento *</label>
+          <select
+            id="tipo"
+            formControlName="tipo"
+            [class.invalid]="isFieldInvalid('tipo')"
+          >
+            <option value="">Selecione o tipo</option>
+            <option *ngFor="let tipo of tiposEquipamento" [value]="tipo.value">
+              {{ tipo.label }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('tipo')" class="error-message">
+            {{ getFieldError("tipo") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="modelo">Modelo *</label>
+          <input
+            type="text"
+            id="modelo"
+            formControlName="modelo"
+            placeholder="Ex: DSBC-63-200-PPVA-N3"
+            [class.invalid]="isFieldInvalid('modelo')"
+          />
+          <div *ngIf="isFieldInvalid('modelo')" class="error-message">
+            {{ getFieldError("modelo") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fabricante">Fabricante *</label>
+          <input
+            type="text"
+            id="fabricante"
+            formControlName="fabricante"
+            placeholder="Ex: Festo"
+            [class.invalid]="isFieldInvalid('fabricante')"
+          />
+          <div *ngIf="isFieldInvalid('fabricante')" class="error-message">
+            {{ getFieldError("fabricante") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="numeroSerie">Número de Série *</label>
+          <input
+            type="text"
+            id="numeroSerie"
+            formControlName="numeroSerie"
+            placeholder="Ex: CP200-001"
+            [class.invalid]="isFieldInvalid('numeroSerie')"
+          />
+          <div *ngIf="isFieldInvalid('numeroSerie')" class="error-message">
+            {{ getFieldError("numeroSerie") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="status">Status Atual *</label>
+          <select
+            id="status"
+            formControlName="status"
+            [class.invalid]="isFieldInvalid('status')"
+          >
+            <option
+              *ngFor="let status of statusEquipamento"
+              [value]="status.value"
+            >
+              {{ status.label }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('status')" class="error-message">
+            {{ getFieldError("status") }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção: Parâmetros Operacionais -->
+    <div class="form-section">
+      <h3>⚙️ Parâmetros Operacionais</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="pressaoOperacao">Pressão de Operação (Bar) *</label>
+          <input
+            type="number"
+            id="pressaoOperacao"
+            formControlName="pressaoOperacao"
+            step="0.1"
+            min="0"
+            max="20"
+            placeholder="Ex: 6.0"
+            [class.invalid]="isFieldInvalid('pressaoOperacao')"
+          />
+          <div *ngIf="isFieldInvalid('pressaoOperacao')" class="error-message">
+            {{ getFieldError("pressaoOperacao") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="temperaturaOperacao"
+            >Temperatura de Operação (°C) *</label
+          >
+          <input
+            type="number"
+            id="temperaturaOperacao"
+            formControlName="temperaturaOperacao"
+            step="0.1"
+            min="-50"
+            max="200"
+            placeholder="Ex: 25.0"
+            [class.invalid]="isFieldInvalid('temperaturaOperacao')"
+          />
+          <div
+            *ngIf="isFieldInvalid('temperaturaOperacao')"
+            class="error-message"
+          >
+            {{ getFieldError("temperaturaOperacao") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="ciclosRealizados">Ciclos Realizados</label>
+          <input
+            type="number"
+            id="ciclosRealizados"
+            formControlName="ciclosRealizados"
+            min="0"
+            placeholder="Ex: 0"
+            [class.invalid]="isFieldInvalid('ciclosRealizados')"
+          />
+          <div *ngIf="isFieldInvalid('ciclosRealizados')" class="error-message">
+            {{ getFieldError("ciclosRealizados") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="intervaloManutencaoHoras"
+            >Intervalo de Manutenção (Horas) *</label
+          >
+          <input
+            type="number"
+            id="intervaloManutencaoHoras"
+            formControlName="intervaloManutencaoHoras"
+            min="1"
+            max="8760"
+            placeholder="Ex: 720"
+            [class.invalid]="isFieldInvalid('intervaloManutencaoHoras')"
+          />
+          <div
+            *ngIf="isFieldInvalid('intervaloManutencaoHoras')"
+            class="error-message"
+          >
+            {{ getFieldError("intervaloManutencaoHoras") }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção: Datas -->
+    <div class="form-section">
+      <h3>📅 Informações de Datas</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dataInstalacao">Data de Instalação *</label>
+          <input
+            type="date"
+            id="dataInstalacao"
+            formControlName="dataInstalacao"
+            [class.invalid]="isFieldInvalid('dataInstalacao')"
+          />
+          <div *ngIf="isFieldInvalid('dataInstalacao')" class="error-message">
+            {{ getFieldError("dataInstalacao") }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="dataUltimaManutencao">Data da Última Manutenção</label>
+          <input
+            type="date"
+            id="dataUltimaManutencao"
+            formControlName="dataUltimaManutencao"
+            [class.invalid]="isFieldInvalid('dataUltimaManutencao')"
+          />
+          <div
+            *ngIf="isFieldInvalid('dataUltimaManutencao')"
+            class="error-message"
+          >
+            {{ getFieldError("dataUltimaManutencao") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="proximaManutencao">Próxima Manutenção</label>
+          <input
+            type="date"
+            id="proximaManutencao"
+            formControlName="proximaManutencao"
+            [class.invalid]="isFieldInvalid('proximaManutencao')"
+          />
+          <div
+            *ngIf="isFieldInvalid('proximaManutencao')"
+            class="error-message"
+          >
+            {{ getFieldError("proximaManutencao") }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção: Observações -->
+    <div class="form-section">
+      <h3>📋 Observações</h3>
+
+      <div class="form-group">
+        <label for="observacoes">Observações Adicionais</label>
+        <textarea
+          id="observacoes"
+          formControlName="observacoes"
+          rows="4"
+          placeholder="Informações adicionais sobre o equipamento..."
+          [class.invalid]="isFieldInvalid('observacoes')"
+        ></textarea>
+        <div *ngIf="isFieldInvalid('observacoes')" class="error-message">
+          {{ getFieldError("observacoes") }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()"
+        [disabled]="isLoading"
+      >
+        ❌ Cancelar
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isLoading || equipamentoForm.invalid"
+      >
+        <span *ngIf="isLoading">⏳ Salvando...</span>
+        <span *ngIf="!isLoading">💾 Salvar Equipamento</span>
+      </button>
+    </div>
+  </form>
+</div>
